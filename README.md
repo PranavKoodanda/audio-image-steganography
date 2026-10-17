@@ -2,9 +2,9 @@
 
 Audio-in-Image Steganography is a Python project for securely packaging an
 arbitrary binary payload, such as a WAV file, inside a PNG image. The current
-implementation provides the cryptographic and PNG container foundations; the
-application API, user interface, and pixel-based steganography are planned for
-later phases.
+implementation provides the cryptographic, PNG container, and pixel-based
+steganography foundations; the application API and user interface are planned
+for later phases.
 
 ## Implemented features
 
@@ -26,6 +26,16 @@ later phases.
   pixels. Extraction validates chunk boundaries and CRC-32 values, rejects
   missing or duplicate payloads, and requires the payload chunk to be directly
   before `IEND`.
+- **LSB pixel embedding:** Stores arbitrary binary data in RGB channels of RGB
+  or RGBA PNG images, with a versioned header containing a magic identifier,
+  payload length, and SHA-256 checksum. Use `calculate_capacity(image)` before
+  calling `embed_lsb(image, payload)`, then call `extract_lsb(image)` to recover
+  the exact bytes. The checksum detects accidental corruption, but is not
+  authentication; use the Phase 1 AES-GCM envelope for that security boundary.
+- **Image-quality measurements:** `calculate_image_metrics(first, second)`
+  reports changed RGB channels, changed-channel ratio, mean squared error
+  (MSE), and peak signal-to-noise ratio (PSNR), excluding alpha from the
+  comparison.
 
 ## Workflow
 
@@ -41,7 +51,7 @@ AES-256-GCM encryption with a password
 versioned encrypted envelope
         │
         ▼
-PNG stEg ancillary-chunk embedding
+PNG stEg ancillary-chunk embedding or LSB pixel embedding
         │
         ▼
 PNG containing the encrypted payload
@@ -57,8 +67,8 @@ incorrect passwords.
 - Python 3.13 is the currently tested environment.
 - [`cryptography`](https://cryptography.io/) provides AES-GCM and Scrypt.
 - `pytest` provides automated tests.
-- Pillow is used only by tests to create PNG fixtures and compare decoded
-  pixels; it is not used to rewrite PNGs during embedding.
+- Pillow decodes RGB/RGBA images for LSB embedding and image comparisons.
+  PNG chunk embedding still operates on bytes without rewriting pixels.
 
 ```text
 backend/
@@ -68,11 +78,14 @@ backend/
 │   │   ├── envelope.py     # Versioned encrypted-envelope format
 │   │   └── validation.py   # Shared input validation
 │   ├── stego/
-│   │   └── png_chunk.py    # PNG stEg chunk embedding and extraction
+│   │   ├── png_chunk.py    # PNG stEg chunk embedding and extraction
+│   │   └── lsb.py          # RGB/RGBA LSB embedding and extraction
 │   └── utils/
-│       └── hashing.py      # SHA-256 helpers
+│       ├── hashing.py       # SHA-256 helpers
+│       └── image_metrics.py # Pixel differences and quality metrics
 ├── tests/
 │   ├── test_crypto.py
+│   ├── test_lsb.py
 │   └── test_png_chunk.py
 └── requirements.txt
 ```
@@ -112,11 +125,16 @@ python -m pytest backend\tests -q
 
 The following are not implemented yet:
 
-- LSB pixel steganography, capacity checks, pixel-difference reporting, and
-  image-quality metrics.
 - FastAPI backend endpoints.
 - React and Vite frontend.
 - End-to-end audio upload, recovery, and user-facing workflow.
+
+PNG chunk embedding preserves decoded pixels, while LSB embedding changes
+some RGB values slightly and preserves alpha. Re-encoding an image may change
+metadata and can discard either embedded representation. Chunk embedding has
+more direct byte capacity and no pixel changes; LSB embedding is a
+pixel-based alternative whose capacity depends on image dimensions and whose
+changes can be measured with the image-quality helpers.
 
 The backend-specific notes are kept in
 [`backend/README.md`](backend/README.md); this file is the primary project
