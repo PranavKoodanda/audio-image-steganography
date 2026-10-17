@@ -248,7 +248,9 @@ function App() {
       <main className="workspace">
         <div className="intro">
           <div>
-            <span className="eyebrow">Secure media utility / 05</span>
+            <span className="eyebrow">
+              {mode === "hide" ? "SECURE MEDIA / ENCODE" : "SECURE MEDIA / DECODE"}
+            </span>
             <h1>{mode === "hide" ? "Hide audio inside an image" : "Recover your original audio"}</h1>
             <p>{mode === "hide"
               ? "Encrypt a WAV file and embed it into a PNG image."
