@@ -1,8 +1,11 @@
 # Audio-in-Image Steganography Backend
 
-This increment provides the encrypted payload foundation and direct PNG custom
-ancillary-chunk embedding. LSB steganography, FastAPI endpoints, and the React
-frontend are intentionally deferred.
+The root [`README.md`](../README.md) is the primary project documentation.
+This file contains backend-specific implementation notes and setup commands.
+
+The current backend provides the encrypted payload foundation and direct PNG
+custom ancillary-chunk embedding. LSB steganography, FastAPI endpoints, and the
+React frontend are intentionally deferred.
 
 `app.stego.png_chunk` inserts arbitrary bytes into a valid `stEg` ancillary
 chunk immediately before `IEND`. It parses and validates the existing PNG
