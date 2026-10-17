@@ -36,6 +36,11 @@ for later phases.
   reports changed RGB channels, changed-channel ratio, mean squared error
   (MSE), and peak signal-to-noise ratio (PSNR), excluding alpha from the
   comparison.
+- **End-to-end WAV workflow:** `hide_wav_in_png(wav_data, png, password,
+  method)` encrypts valid WAV bytes and embeds the authenticated envelope using
+  either `chunk` or `lsb`. `recover_wav_from_png(png, password, method)`
+  extracts, authenticates, decrypts, and validates the WAV before returning
+  the exact original bytes. Passwords are never stored or logged.
 
 ## Workflow
 
@@ -62,6 +67,24 @@ decryption routine. PNG CRC-32 detects chunk corruption, while AES-GCM
 authentication provides the security boundary for detecting tampering and
 incorrect passwords.
 
+Example Python usage:
+
+```python
+from backend.app.services.workflow import hide_wav_in_png, recover_wav_from_png
+
+with open("input.wav", "rb") as wav_file, open("cover.png", "rb") as png_file:
+    embedded_png = hide_wav_in_png(wav_file.read(), png_file.read(), "password", "chunk")
+
+recovered_wav = recover_wav_from_png(embedded_png, "password", "chunk")
+with open("recovered.wav", "wb") as wav_file:
+    wav_file.write(recovered_wav)
+```
+
+Use `method="lsb"` for pixel-based embedding. LSB modifies RGB pixel values
+slightly and can be damaged by resizing or re-encoding. Custom `stEg` chunks
+can be stripped by image-processing or upload services. Neither method
+guarantees invisibility or resistance to steganalysis.
+
 ## Technology and structure
 
 - Python 3.13 is the currently tested environment.
@@ -80,6 +103,8 @@ backend/
 │   ├── stego/
 │   │   ├── png_chunk.py    # PNG stEg chunk embedding and extraction
 │   │   └── lsb.py          # RGB/RGBA LSB embedding and extraction
+│   ├── services/
+│   │   └── workflow.py      # End-to-end encrypted WAV workflows
 │   └── utils/
 │       ├── hashing.py       # SHA-256 helpers
 │       └── image_metrics.py # Pixel differences and quality metrics
@@ -87,6 +112,7 @@ backend/
 │   ├── test_crypto.py
 │   ├── test_lsb.py
 │   └── test_png_chunk.py
+│   └── test_workflow.py
 └── requirements.txt
 ```
 
@@ -127,7 +153,7 @@ The following are not implemented yet:
 
 - FastAPI backend endpoints.
 - React and Vite frontend.
-- End-to-end audio upload, recovery, and user-facing workflow.
+- User-facing upload/recovery interface and GUI.
 
 PNG chunk embedding preserves decoded pixels, while LSB embedding changes
 some RGB values slightly and preserves alpha. Re-encoding an image may change
