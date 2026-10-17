@@ -303,7 +303,6 @@ legend { padding: 0; margin-bottom: 11px; }
   gap: 10px;
   align-items: flex-start;
   cursor: pointer;
-  transition: border-color .18s, background .18s;
 }
 .method-option:hover { border-color: var(--border-strong); background: rgba(99, 102, 241, .05); }
 .method-option.selected { border-color: var(--accent); background: rgba(99, 102, 241, .12); }
