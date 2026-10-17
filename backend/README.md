@@ -1,8 +1,15 @@
 # Audio-in-Image Steganography Backend
 
-This increment provides the encrypted payload foundation only. PNG chunk
-embedding, LSB steganography, FastAPI endpoints, and the React frontend are
-intentionally deferred.
+This increment provides the encrypted payload foundation and direct PNG custom
+ancillary-chunk embedding. LSB steganography, FastAPI endpoints, and the React
+frontend are intentionally deferred.
+
+`app.stego.png_chunk` inserts arbitrary bytes into a valid `stEg` ancillary
+chunk immediately before `IEND`. It parses and validates the existing PNG
+without decoding or re-encoding it, so all original chunks remain byte-for-byte
+unchanged and decoded pixels remain unchanged. Embedding rejects an image that
+already contains `stEg`; extraction rejects missing or duplicate payload
+chunks.
 
 ## Encryption design
 
