@@ -47,6 +47,13 @@ for a later phase.
   multipart `image`, `password`, and `method` fields and returns a downloadable
   `recovered.wav`. The API validates uploaded content, maps workflow failures
   to controlled HTTP errors, and never logs or stores passwords.
+- **React frontend:** A Vite-powered desktop-first workbench provides hide and
+  recover workflows, drag-and-drop WAV/PNG selection, method and password
+  controls, API health status, error feedback, and real blob downloads from the
+  backend. Its Nebula Core dark cybersecurity workbench theme uses a sticky
+  navigation bar, restrained indigo/cyan depth, responsive two-column
+  workspace, high-contrast form states, and reduced-motion support. Passwords
+  remain in component memory only.
 
 ## Workflow
 
@@ -125,6 +132,9 @@ backend/
 └── requirements.txt
 ```
 
+The frontend is in `frontend/` and uses React with Vite. It does not duplicate
+encryption or steganography logic; all operations go through the FastAPI API.
+
 ## Setup and tests
 
 From the repository root on Windows:
@@ -147,6 +157,20 @@ Run the API from the repository root after installing
 ```powershell
 backend\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --reload
 ```
+
+Run the frontend in a second terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+In local development, the Vite server proxies relative `/api` requests to
+`http://127.0.0.1:8000`, so no CORS configuration is required. Set
+`VITE_API_BASE_URL` in a frontend `.env` file to use an absolute backend URL
+for deployments or a different development setup; when set, requests use that
+URL directly instead of the Vite proxy.
 
 Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
 Both embedding methods use the `method` form field with either `chunk` or
@@ -173,13 +197,6 @@ are rejected with HTTP `413 Payload Too Large` before workflow processing.
   individual chunk data to 256 MiB.
 - No password, derived key, audio validation, or payload metadata is stored in
   the PNG chunk.
-
-## Planned features
-
-The following are not implemented yet:
-
-- React and Vite frontend.
-- User-facing upload/recovery interface and GUI.
 
 PNG chunk embedding preserves decoded pixels, while LSB embedding changes
 some RGB values slightly and preserves alpha. Re-encoding an image may change
