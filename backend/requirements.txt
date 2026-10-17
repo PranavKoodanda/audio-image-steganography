@@ -1,0 +1,2 @@
+cryptography>=45.0,<47.0
+pytest>=8.3,<10.0

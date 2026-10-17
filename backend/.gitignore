@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# VS Code workspace settings
+.vscode/
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# OS files
+.DS_Store
+Thumbs.db
