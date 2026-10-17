@@ -3,9 +3,9 @@
 The root [`README.md`](../README.md) is the primary project documentation.
 This file contains backend-specific implementation notes and setup commands.
 
-The current backend provides the encrypted payload foundation and direct PNG
-custom ancillary-chunk embedding. LSB steganography, FastAPI endpoints, and the
-React frontend are intentionally deferred.
+The current backend provides the encrypted payload foundation, direct PNG
+custom ancillary-chunk embedding, LSB steganography, and FastAPI endpoints.
+The React frontend remains deferred.
 
 `app.stego.png_chunk` inserts arbitrary bytes into a valid `stEg` ancillary
 chunk immediately before `IEND`. It parses and validates the existing PNG
@@ -44,4 +44,10 @@ When using an already configured interpreter from the repository root:
 
 ```powershell
 python -m pytest backend\tests
+```
+
+Run the API from the repository root:
+
+```powershell
+python -m uvicorn backend.app.main:app --reload
 ```

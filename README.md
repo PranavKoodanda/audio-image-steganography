@@ -2,9 +2,9 @@
 
 Audio-in-Image Steganography is a Python project for securely packaging an
 arbitrary binary payload, such as a WAV file, inside a PNG image. The current
-implementation provides the cryptographic, PNG container, and pixel-based
-steganography foundations; the application API and user interface are planned
-for later phases.
+implementation provides the cryptographic, PNG container, pixel-based
+steganography, and FastAPI backend foundations; the user interface is planned
+for a later phase.
 
 ## Implemented features
 
@@ -41,6 +41,12 @@ for later phases.
   either `chunk` or `lsb`. `recover_wav_from_png(png, password, method)`
   extracts, authenticates, decrypts, and validates the WAV before returning
   the exact original bytes. Passwords are never stored or logged.
+- **FastAPI backend:** `GET /api/health` reports API availability. `POST
+  /api/hide` accepts multipart `wav`, `image`, `password`, and `method` fields
+  and returns a downloadable `stego.png`. `POST /api/recover` accepts
+  multipart `image`, `password`, and `method` fields and returns a downloadable
+  `recovered.wav`. The API validates uploaded content, maps workflow failures
+  to controlled HTTP errors, and never logs or stores passwords.
 
 ## Workflow
 
@@ -89,6 +95,7 @@ guarantees invisibility or resistance to steganalysis.
 
 - Python 3.13 is the currently tested environment.
 - [`cryptography`](https://cryptography.io/) provides AES-GCM and Scrypt.
+- FastAPI and Uvicorn provide the HTTP API and development server.
 - `pytest` provides automated tests.
 - Pillow decodes RGB/RGBA images for LSB embedding and image comparisons.
   PNG chunk embedding still operates on bytes without rewriting pixels.
@@ -96,6 +103,7 @@ guarantees invisibility or resistance to steganalysis.
 ```text
 backend/
 ├── app/
+│   ├── main.py             # FastAPI application and HTTP endpoints
 │   ├── core/
 │   │   ├── crypto.py       # AES-GCM encryption and Scrypt key derivation
 │   │   ├── envelope.py     # Versioned encrypted-envelope format
@@ -109,6 +117,7 @@ backend/
 │       ├── hashing.py       # SHA-256 helpers
 │       └── image_metrics.py # Pixel differences and quality metrics
 ├── tests/
+│   ├── test_api.py
 │   ├── test_crypto.py
 │   ├── test_lsb.py
 │   └── test_png_chunk.py
@@ -132,6 +141,24 @@ With an already configured Python environment:
 python -m pytest backend\tests -q
 ```
 
+Run the API from the repository root after installing
+`backend\requirements.txt`:
+
+```powershell
+backend\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --reload
+```
+
+Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
+Both embedding methods use the `method` form field with either `chunk` or
+`lsb`; wrong passwords, invalid files, malformed payloads, and insufficient
+LSB capacity return controlled errors rather than stack traces.
+
+The API limits each uploaded WAV and PNG file to 20 MiB by default. These
+limits are defined as `MAX_WAV_UPLOAD_SIZE` and `MAX_PNG_UPLOAD_SIZE` in
+`backend/app/main.py` and can be adjusted before starting the server. Uploads
+are read incrementally in bounded chunks; files exceeding a configured limit
+are rejected with HTTP `413 Payload Too Large` before workflow processing.
+
 ## Limitations and security considerations
 
 - PNG chunk embedding does not encrypt data by itself. Use the encrypted
@@ -151,7 +178,6 @@ python -m pytest backend\tests -q
 
 The following are not implemented yet:
 
-- FastAPI backend endpoints.
 - React and Vite frontend.
 - User-facing upload/recovery interface and GUI.
 
