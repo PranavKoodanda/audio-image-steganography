@@ -44,7 +44,8 @@ embedded data.
   signal-to-noise ratio (PSNR).
 - Includes a React/Vite interface with drag-and-drop file selection, PNG
   preview, method selection, password visibility controls, API status,
-  validation and API error feedback, loading states, and downloadable outputs.
+  validation and API error feedback, loading states, downloadable outputs, and
+  a subtle footer linking to the creator's GitHub profile.
 - Provides FastAPI endpoints for health checks, hiding, and recovery.
 - Limits each uploaded WAV and PNG file to 20 MiB by default and reads uploads
   incrementally before workflow processing.

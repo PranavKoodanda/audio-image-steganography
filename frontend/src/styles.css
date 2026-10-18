@@ -424,10 +424,14 @@ legend { padding: 0; margin-bottom: 11px; }
   display: flex;
   justify-content: space-between;
   color: var(--subtle);
-  font: 9px "IBM Plex Mono", monospace;
-  letter-spacing: .08em;
+  font-size: 10px;
 }
-.footer span:last-child { letter-spacing: 0; }
+.footer a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .18s;
+}
+.footer a:hover, .footer a:focus-visible { color: var(--accent-bright); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }

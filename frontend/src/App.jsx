@@ -295,7 +295,10 @@ function App() {
           </form>
         )}
       </main>
-      <footer className="footer"><span>LOCAL WORKBENCH</span><span>Files remain in memory and are sent only to your configured API.</span></footer>
+      <footer className="footer">
+        <span>Built by Pranav K M</span>
+        <a href="https://github.com/PranavKoodanda" target="_blank" rel="noopener noreferrer">GitHub Profile</a>
+      </footer>
     </div>
   );
 }
