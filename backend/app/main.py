@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import Literal
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
 from backend.app.core.crypto import AuthenticationError
@@ -21,6 +22,16 @@ from backend.app.stego.png_chunk import PNGChunkError
 app = FastAPI(
     title="Audio Image Steganography API",
     description="Encrypt WAV audio and hide it in PNG images.",
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://audio-image-steganography.vercel.app",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Accept", "Content-Type"],
 )
 
 Method = Literal["chunk", "lsb"]

@@ -171,6 +171,12 @@ The API listens on the Uvicorn default `http://127.0.0.1:8000`. FastAPI's
 interactive documentation is available at
 `http://127.0.0.1:8000/docs`.
 
+The API accepts browser requests from the deployed frontend
+(`https://audio-image-steganography.vercel.app`) and the Vite development
+origins `http://localhost:5173` and `http://127.0.0.1:5173`. CORS is limited
+to the API's GET, POST, and OPTIONS methods and the request headers used by the
+frontend; other origins are not permitted.
+
 ### Frontend
 
 Open a second PowerShell terminal:
