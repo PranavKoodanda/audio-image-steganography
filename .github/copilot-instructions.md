@@ -1,0 +1,3 @@
+# Project documentation rule
+
+After every implementation phase, update the root README.md to document all newly implemented main features. Keep documentation concise and feature-focused. Explain what each feature does, the purpose of the feature, important security considerations, and how to use it when applicable. Document only verified behavior. Clearly distinguish implemented features from planned features. Do not spend documentation space explaining trivial helper functions, individual lines, or minor implementation details. Preserve existing documentation and update it rather than creating unnecessary duplicate documentation files.
